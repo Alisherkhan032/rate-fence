@@ -1,0 +1,60 @@
+{
+  "name": "rate-fence",
+  "version": "0.1.0",
+  "description": "Production-grade API protection engine for Node.js — rate limiting, threat detection, and resource protection",
+  "license": "MIT",
+  "author": {
+    "name": "Ali Sher Khan",
+    "email": "alisherkhan032@gmail.com"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "clean": "rm -rf dist",
+    "test": "vitest run --config ../../vitest.config.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.1",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  },
+  "keywords": [
+    "rate-limit",
+    "api-security",
+    "express",
+    "middleware",
+    "protection",
+    "token-bucket",
+    "sliding-window"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alisherkhan032/rate-fence.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/Alisherkhan032/rate-fence/issues"
+  },
+  "homepage": "https://github.com/Alisherkhan032/rate-fence#readme"
+}
