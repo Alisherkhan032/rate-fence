@@ -1,6 +1,6 @@
 # @rate-fence/express
 
-Express middleware for [RateFence](https://github.com/rate-fence/rate-fence).
+Express middleware for [RateFence](https://github.com/Alisherkhan032/rate-fence).
 
 ```bash
 npm install rate-fence @rate-fence/express express
