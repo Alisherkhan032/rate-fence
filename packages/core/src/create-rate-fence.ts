@@ -1,5 +1,6 @@
 import { systemClock } from "./clock/system-clock.js";
 import type { Clock } from "./clock/types.js";
+import { resolveConfig } from "./config/defaults.js";
 import { validateConfig } from "./config/validate.js";
 import { buildRequestContext } from "./context/build-context.js";
 import { DecisionEngine } from "./engine/decision-engine.js";
@@ -15,6 +16,9 @@ import type { FenceEventName, FenceEvents } from "./types/events.js";
 import type { Policy } from "./types/policy.js";
 import type { SecuritySignal } from "./types/signals.js";
 import type { FenceStats } from "./types/stats.js";
+
+export { DEFAULT_RATE_LIMIT, resolveConfig } from "./config/defaults.js";
+export type { ResolvedRateFenceConfig } from "./config/defaults.js";
 
 export interface RateFence {
   /**
@@ -43,30 +47,34 @@ export interface RateFence {
 /**
  * Create a RateFence instance.
  *
+ * When `rateLimit` is omitted, a default sliding-window limit of 100 requests
+ * per 60 seconds is applied. Pass `rateLimit: false` to disable global limiting.
+ *
  * The default in-memory store is process-local. Multiple Node.js processes
  * do not share rate-limit or threat state.
  */
 export function createRateFence(config: RateFenceConfig = {}): RateFence {
   validateConfig(config);
+  const resolved = resolveConfig(config);
 
-  const clock: Clock = config.clock ?? systemClock;
-  const ownsStore = !config.store;
+  const clock: Clock = resolved.clock ?? systemClock;
+  const ownsStore = !resolved.store;
   const store: StateStore =
-    config.store ??
+    resolved.store ??
     new MemoryStateStore({
-      maxEntries: config.storeConfig?.maxEntries,
-      cleanupIntervalMs: config.storeConfig?.cleanupIntervalMs,
+      maxEntries: resolved.storeConfig?.maxEntries,
+      cleanupIntervalMs: resolved.storeConfig?.cleanupIntervalMs,
       clock,
     });
 
   const events = new EventBus();
-  const policies = new PolicyRegistry(config.policies ?? []);
+  const policies = new PolicyRegistry(resolved.policies ?? []);
   const threat = new ThreatDetector(
-    config.threatDetection ?? { enabled: false },
+    resolved.threatDetection ?? { enabled: false },
     store,
     clock,
   );
-  const engine = new DecisionEngine(config, store, clock, policies, events, threat);
+  const engine = new DecisionEngine(resolved, store, clock, policies, events, threat);
 
   let closed = false;
 
@@ -80,8 +88,8 @@ export function createRateFence(config: RateFenceConfig = {}): RateFence {
 
     buildContext(input) {
       return buildRequestContext(input, {
-        trustProxy: config.trustProxy,
-        fingerprint: config.fingerprint,
+        trustProxy: resolved.trustProxy,
+        fingerprint: resolved.fingerprint,
       });
     },
 

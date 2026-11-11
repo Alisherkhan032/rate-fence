@@ -9,7 +9,7 @@ import { createRateLimiter } from "../rate-limit/create-limiter.js";
 import type { StateStore } from "../storage/types.js";
 import { StoreKeys } from "../storage/keys.js";
 import type { ThreatDetector, ThreatHit } from "../threat/detector.js";
-import type { RateFenceConfig } from "../types/config.js";
+import type { ResolvedRateFenceConfig } from "../config/defaults.js";
 import type { KeyGenerator, RequestContext } from "../types/context.js";
 import type { SecurityDecision } from "../types/decision.js";
 import type { RateLimitAlgorithmConfig } from "../types/rate-limit.js";
@@ -37,7 +37,7 @@ export class DecisionEngine {
   };
 
   constructor(
-    private readonly config: RateFenceConfig,
+    private readonly config: ResolvedRateFenceConfig,
     private readonly store: StateStore,
     private readonly clock: Clock,
     private readonly policies: PolicyRegistry,
