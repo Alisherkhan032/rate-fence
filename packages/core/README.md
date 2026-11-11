@@ -66,8 +66,12 @@ if (!decision.allowed) {
 
 ## Configuration
 
+**Default rate limit:** if `rateLimit` is omitted, RateFence uses **sliding-window, 100 requests / 60 seconds**. Use `rateLimit: false` to disable global rate limiting.
+
 ```ts
 const fence = createRateFence({
+  // rateLimit omitted → sliding-window, 100 / 60s
+  // rateLimit: false, // disable global rate limiting
   rateLimit: {
     algorithm: "sliding-window", // or "fixed-window" | "token-bucket"
     windowMs: 60_000,

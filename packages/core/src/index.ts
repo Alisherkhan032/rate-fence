@@ -1,5 +1,5 @@
-export { createRateFence } from "./create-rate-fence.js";
-export type { RateFence } from "./create-rate-fence.js";
+export { createRateFence, DEFAULT_RATE_LIMIT, resolveConfig } from "./create-rate-fence.js";
+export type { RateFence, ResolvedRateFenceConfig } from "./create-rate-fence.js";
 
 export { buildRequestContext } from "./context/build-context.js";
 export { MemoryStateStore } from "./storage/memory-store.js";

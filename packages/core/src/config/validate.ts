@@ -66,7 +66,9 @@ export function validateConfig(config: RateFenceConfig): void {
     }
   }
 
-  if (config.rateLimit) {
+  if (config.rateLimit === false) {
+    // Explicit disable — valid.
+  } else if (config.rateLimit !== undefined) {
     validateRateLimitConfig(config.rateLimit);
   }
 

@@ -55,7 +55,13 @@ export interface MemoryStoreConfig {
 }
 
 export interface RateFenceConfig {
-  rateLimit?: RateLimitAlgorithmConfig;
+  /**
+   * Global rate limit.
+   * - omitted: default sliding-window (100 requests / 60s)
+   * - `false`: disable global rate limiting
+   * - object: use the given algorithm config
+   */
+  rateLimit?: RateLimitAlgorithmConfig | false;
   trustProxy?: TrustProxyConfig;
   keyGenerator?: KeyGenerator;
   fingerprint?: FingerprintConfig;

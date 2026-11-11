@@ -1,6 +1,6 @@
 {
   "name": "rate-fence",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Production-grade API protection engine for Node.js — rate limiting, threat detection, and resource protection",
   "license": "MIT",
   "author": {
