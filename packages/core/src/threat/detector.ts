@@ -32,22 +32,30 @@ const DEFAULT_RULES: Record<string, Required<Pick<ThreatRuleConfig, "threshold" 
   repeatedBlocked: { threshold: 10, windowMs: 60_000, blockTtlMs: 120_000 },
 };
 
+/**
+ * Rules are opt-in: a rule runs only when it appears under `threatDetection.rules`
+ * and is not explicitly `enabled: false`. Missing threshold/window/block TTL
+ * fields are filled from DEFAULT_RULES.
+ */
 function resolveRule(
   name: string,
   override?: ThreatRuleConfig,
 ): (Required<Pick<ThreatRuleConfig, "threshold" | "windowMs" | "blockTtlMs">> & ThreatRuleConfig) | undefined {
-  if (override?.enabled === false) {
+  // Omitted from config → off (do not auto-enable defaults).
+  if (override === undefined) {
+    return undefined;
+  }
+  if (override.enabled === false) {
     return undefined;
   }
   const defaults = DEFAULT_RULES[name];
   if (!defaults) {
     return undefined;
   }
-  // If rules object omits the rule entirely, treat as enabled with defaults when parent enabled.
   return {
     ...defaults,
     ...override,
-    enabled: override?.enabled ?? true,
+    enabled: override.enabled ?? true,
   };
 }
 

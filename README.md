@@ -152,7 +152,19 @@ Do not set `trustProxy: true` unless you are behind a reverse proxy you control.
 
 ## Threat detection
 
-Opt-in. Rules use local counters and explicit signals:
+Parent switch is `threatDetection.enabled`. **Individual rules are opt-in**: a rule runs only if you list it under `rules`. Omitted rules (including `sensitiveEndpoint`) stay off — they are not auto-enabled with defaults.
+
+```ts
+threatDetection: {
+  enabled: true,
+  rules: {
+    failedAuthentication: { threshold: 8, windowMs: 300_000, blockTtlMs: 60_000 },
+    // sensitiveEndpoint: { threshold: 20, windowMs: 60_000 } // only if you opt in
+  },
+},
+```
+
+Report app-level events with signals:
 
 ```ts
 fence.reportSignal({
@@ -163,7 +175,7 @@ fence.reportSignal({
 
 Supported signals: `authentication.failure`, `authentication.success`, `response.status`, `payload.oversized`, `request.blocked`.
 
-Threat responses are temporary (TTL blocks / events). RateFence never permanently bans based on weak fingerprints.
+`sensitivePaths` only applies when `sensitiveEndpoint` is enabled. Threat responses are temporary (TTL blocks / events). RateFence never permanently bans based on weak fingerprints.
 
 ## Concurrency protection
 

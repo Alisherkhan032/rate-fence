@@ -3,6 +3,7 @@
   "references": [
     { "path": "./packages/core" },
     { "path": "./packages/express" },
-    { "path": "./examples/express-api" }
+    { "path": "./examples/express-api" },
+    { "path": "./benchmarks" }
   ]
 }

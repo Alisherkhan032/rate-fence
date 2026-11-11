@@ -20,6 +20,7 @@ describe("threat detection", () => {
     const fence = createRateFence({
       clock,
       storeConfig: { cleanupIntervalMs: 0 },
+      rateLimit: false,
       threatDetection: {
         enabled: true,
         rules: {
@@ -51,6 +52,7 @@ describe("threat detection", () => {
     const fence = createRateFence({
       clock: new FakeClock(0),
       storeConfig: { cleanupIntervalMs: 0 },
+      rateLimit: false,
       threatDetection: {
         enabled: true,
         rules: {
@@ -65,6 +67,70 @@ describe("threat detection", () => {
     fence.reportSignal({ type: "response.status", key: "k", status: 404 });
     fence.reportSignal({ type: "response.status", key: "k", status: 404 });
     expect(events).toContain("excessive404");
+    await fence.close();
+  });
+
+  it("does not run omitted rules like sensitiveEndpoint", async () => {
+    const fence = createRateFence({
+      clock: new FakeClock(0),
+      storeConfig: { cleanupIntervalMs: 0 },
+      rateLimit: false,
+      threatDetection: {
+        enabled: true,
+        rules: {
+          failedAuthentication: {
+            threshold: 100,
+            windowMs: 60_000,
+            blockTtlMs: 60_000,
+          },
+        },
+      },
+    });
+
+    const loginCtx: RequestContext = {
+      ...ctx(),
+      path: "/login",
+      method: "POST",
+    };
+
+    for (let i = 0; i < 25; i += 1) {
+      const decision = await fence.evaluate(loginCtx);
+      expect(decision.allowed).toBe(true);
+    }
+
+    await fence.close();
+  });
+
+  it("blocks sensitiveEndpoint only when opted in", async () => {
+    const fence = createRateFence({
+      clock: new FakeClock(0),
+      storeConfig: { cleanupIntervalMs: 0 },
+      rateLimit: false,
+      threatDetection: {
+        enabled: true,
+        rules: {
+          sensitiveEndpoint: {
+            threshold: 3,
+            windowMs: 60_000,
+            blockTtlMs: 60_000,
+          },
+        },
+      },
+    });
+
+    const loginCtx: RequestContext = {
+      ...ctx(),
+      path: "/login",
+      method: "POST",
+    };
+
+    expect((await fence.evaluate(loginCtx)).allowed).toBe(true);
+    expect((await fence.evaluate(loginCtx)).allowed).toBe(true);
+    expect((await fence.evaluate(loginCtx)).allowed).toBe(true);
+
+    const blocked = await fence.evaluate(loginCtx);
+    expect(blocked.allowed).toBe(false);
+    expect(blocked.reason).toBe("client_blocked");
     await fence.close();
   });
 });

@@ -152,7 +152,18 @@ By default RateFence uses the **socket remote address** only. Spoofed `X-Forward
 
 ## Threat detection
 
-Opt-in. The library cannot invent auth outcomes — report them:
+`threatDetection.enabled` turns the engine on. **Each rule must be listed** under `rules` to run; omitted rules stay off (no surprise `sensitiveEndpoint` blocks on `/login`).
+
+```ts
+threatDetection: {
+  enabled: true,
+  rules: {
+    failedAuthentication: { threshold: 8, windowMs: 300_000, blockTtlMs: 60_000 },
+  },
+},
+```
+
+The library cannot invent auth outcomes — report them:
 
 ```ts
 fence.reportSignal({
@@ -163,7 +174,7 @@ fence.reportSignal({
 
 Signals: `authentication.failure`, `authentication.success`, `response.status`, `payload.oversized`, `request.blocked`.
 
-Responses are temporary (TTL blocks / events). No permanent bans from weak fingerprints.
+`sensitivePaths` applies only when `sensitiveEndpoint` is opted in. Responses are temporary (TTL blocks / events).
 
 ## Concurrency and size
 
